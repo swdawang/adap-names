@@ -20,8 +20,17 @@ export class Name {
 
     /** Expects that all Name components are properly masked */
     constructor(other: string[], delimiter?: string) {
-        throw new Error("needs implementation or deletion");
+        this.delimiter = delimiter ?? DEFAULT_DELIMITER;
+        if (!Array.isArray(other)) {
+            throw new Error("other must be an array of strings");
+        }
+
+        this.components = other.map(c => c.trim());
     }
+        toString(): string {
+            return this.components.join(this.delimiter);
+    }
+    
 
     /**
      * Returns a human-readable representation of the Name instance using user-set special characters
@@ -29,7 +38,10 @@ export class Name {
      * Users can vary the delimiter character to be used
      */
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation or deletion");
+        if (!this.components || this.components.length === 0) {
+            return "";
+        }
+    return this.components.join(delimiter);
     }
 
     /** 
@@ -38,36 +50,107 @@ export class Name {
      * The special characters in the data string are the default characters
      */
     public asDataString(): string {
-        throw new Error("needs implementation or deletion");
+        if (!this.components || this.components.length === 0) {
+            return "";
+        }
+
+        const delimiter = DEFAULT_DELIMITER;
+
+        const escapedComponents = this.components.map(c =>c
+        .replace(/\\/g, "\\\\") 
+        .replace(new RegExp(`\\${delimiter}`, "g"), `\\${delimiter}`) // 再转义分隔符
+        );
+        return escapedComponents.join(delimiter);
     }
 
     /** Returns properly masked component string */
     public getComponent(i: number): string {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+    return this.components[i];
     }
 
     /** Expects that new Name component c is properly masked */
     public setComponent(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+        if (typeof c !== "string") {
+            throw new Error("component must be a string");
+        }
     }
 
      /** Returns number of components in Name instance */
      public getNoComponents(): number {
-        throw new Error("needs implementation or deletion");
+        return this.components.length;
     }
 
     /** Expects that new Name component c is properly masked */
     public insert(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i > this.components.length) {
+            throw new Error("component index out of range");
+        }
+        if (typeof c !== "string") {
+            throw new Error("component must be a string");
+        }
+
+        let escaped = false;
+        for (let k = 0; k < c.length; k++) {
+            const ch = c[k];
+
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+
+        if (ch === "\\") {
+            escaped = true;
+            continue;
+        }
+
+        if (ch === this.delimiter) {
+            throw new Error("component is not properly masked");
+        }
+    }
+    if (escaped) {
+        throw new Error("component is not properly masked");
+    }
+    this.components.splice(i, 0, c);
     }
 
     /** Expects that new Name component c is properly masked */
     public append(c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (typeof c !== "string") {
+            throw new Error("component must be a string");
+        }
+        let escaped = false;
+        for (let k = 0; k < c.length; k++) {
+            const ch = c[k];
+
+            if (escaped) {            // 当前字符被转义
+                escaped = false;
+                continue;
+            }
+            if (ch === "\\") {        // 开启转义
+                escaped = true;
+            continue;
+            }
+            if (ch === this.delimiter) {
+                throw new Error("component is not properly masked");
+            }
+        }
+        if (escaped) {
+            throw new Error("component is not properly masked");
+        }
+        this.components.push(c);
     }
 
     public remove(i: number): void {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+        this.components.splice(i, 1);
     }
 
 }
