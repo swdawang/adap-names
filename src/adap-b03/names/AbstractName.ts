@@ -10,11 +10,7 @@ export abstract class AbstractName implements Name {
     }
 
     public clone(): Name {
-        const components: string[] = [];
-        for (let i = 0; i < this.getNoComponents(); i++) {
-            components.push(this.getComponent(i));
-        }
-        return new (require("./Name").Name)(components, this.delimiter);
+        throw new Error("needs implementation or deletion");
     }
 
     public asString(delimiter: string = this.delimiter): string {
@@ -76,13 +72,9 @@ export abstract class AbstractName implements Name {
         for (let i = 0; i < n; i++) {
             const comp = this.getComponent(i);
             for (let j = 0; j < comp.length; j++) {
-                hash = (31 * hash + comp.charCodeAt(j)) | 0; // 保持在 32 位整数
-            }
-            if (i < n - 1 && this.delimiter.length > 0) {
-                hash = (31 * hash + this.delimiter.charCodeAt(0)) | 0;
+                hash = (31 * hash + comp.charCodeAt(j)) | 0;
             }
         }
-
         return hash;
     }
 
