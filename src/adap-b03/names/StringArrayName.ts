@@ -7,63 +7,143 @@ export class StringArrayName extends AbstractName {
     protected components: string[] = [];
 
     constructor(source: string[], delimiter?: string) {
-        super();
-        throw new Error("needs implementation or deletion");
+        super(delimiter ?? DEFAULT_DELIMITER);
+
+        if (!Array.isArray(source)) {
+            throw new Error("source must be an array of strings");
+        }
+        this.components = source.slice();
     }
 
     public clone(): Name {
-        throw new Error("needs implementation or deletion");
+        return new StringArrayName(this.components.slice(), this.delimiter);
     }
 
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation or deletion");
+        return super.asString(delimiter);
     }
 
     public asDataString(): string {
-        throw new Error("needs implementation or deletion");
+        return super.asDataString();
     }
 
     public isEqual(other: Name): boolean {
-        throw new Error("needs implementation or deletion");
+        return super.isEqual(other);
     }
 
     public getHashCode(): number {
-        throw new Error("needs implementation or deletion");
+        return super.getHashCode();
     }
 
     public isEmpty(): boolean {
-        throw new Error("needs implementation or deletion");
+        return super.isEmpty();
     }
 
     public getDelimiterCharacter(): string {
-        throw new Error("needs implementation or deletion");
+        return this.delimiter;
     }
 
     public getNoComponents(): number {
-        throw new Error("needs implementation or deletion");
+        return this.components.length;
     }
 
     public getComponent(i: number): string {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+        return this.components[i];
     }
 
     public setComponent(i: number, c: string) {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+
+        let escaped = false;
+        for (let k = 0; k < c.length; k++) {
+            const ch = c[k];
+
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            if (ch === ESCAPE_CHARACTER) {
+                escaped = true;
+                continue;
+            }
+            if (ch === this.delimiter) {
+                throw new Error("component is not properly masked");
+            }
+        }
+        if (escaped) {
+            throw new Error("component is not properly masked");
+        }
+
+        this.components[i] = c;
     }
 
     public insert(i: number, c: string) {
-        throw new Error("needs implementation or deletion");
+        if (!Number.isInteger(i) || i < 0 || i > this.components.length) {
+            throw new Error("component index out of range");
+        }
+
+        let escaped = false;
+        for (let k = 0; k < c.length; k++) {
+            const ch = c[k];
+
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            if (ch === ESCAPE_CHARACTER) {
+                escaped = true;
+                continue;
+            }
+            if (ch === this.delimiter) {
+                throw new Error("component is not properly masked");
+            }
+        }
+        if (escaped) {
+            throw new Error("component is not properly masked");
+        }
+
+        this.components.splice(i, 0, c);
     }
 
     public append(c: string) {
-        throw new Error("needs implementation or deletion");
+        let escaped = false;
+        for (let k = 0; k < c.length; k++) {
+            const ch = c[k];
+
+            if (escaped) {
+                escaped = false;
+                continue;
+            }
+            if (ch === ESCAPE_CHARACTER) {
+                escaped = true;
+                continue;
+            }
+            if (ch === this.delimiter) {
+                throw new Error("component is not properly masked");
+            }
+        }
+        if (escaped) {
+            throw new Error("component is not properly masked");
+        }
+
+        this.components.push(c);
     }
 
     public remove(i: number) {
-        throw new Error("needs implementation or deletion");
-    }
-
+        if (!Number.isInteger(i) || i < 0 || i >= this.components.length) {
+            throw new Error("component index out of range");
+        }
+        this.components.splice(i, 1);
+    }    
     public concat(other: Name): void {
-        throw new Error("needs implementation or deletion");
+        const n = other.getNoComponents();
+        for (let i = 0; i < n; i++) {
+            this.append(other.getComponent(i));
+        }
     }
 }
