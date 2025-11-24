@@ -9,9 +9,7 @@ export abstract class AbstractName implements Name {
         this.delimiter = delimiter;
     }
 
-    public clone(): Name {
-        throw new Error("needs implementation or deletion");
-    }
+    public abstract clone(): Name;
 
     public asString(delimiter: string = this.delimiter): string {
         const n = this.getNoComponents();
@@ -52,30 +50,18 @@ export abstract class AbstractName implements Name {
     }
 
     public isEqual(other: Name): boolean {
-        const n1 = this.getNoComponents();
-        const n2 = other.getNoComponents();
-        if (n1 !== n2) {
-            return false;
-        }
-        for (let i = 0; i < n1; i++) {
-            if (this.getComponent(i) !== other.getComponent(i)) {
-                return false;
-            }
-        }
-        return true;
+        return this.asDataString() === other.asDataString();
     }
 
     public getHashCode(): number {
-        let hash = 17;
-        const n = this.getNoComponents();
-
-        for (let i = 0; i < n; i++) {
-            const comp = this.getComponent(i);
-            for (let j = 0; j < comp.length; j++) {
-                hash = (31 * hash + comp.charCodeAt(j)) | 0;
-            }
-        }
-        return hash;
+        let hashCode: number = 0;
+        const s: string = this.asDataString();
+        for (let i: number = 0; i < s.length; i++) {
+            let c: number = s.charCodeAt(i);
+            hashCode = (hashCode << 5) - hashCode + c;
+            hashCode |= 0;
+    }
+    return hashCode;
     }
 
     public isEmpty(): boolean {
